@@ -21,6 +21,9 @@ nature, when statistically significant.
 
 
 
+Check [notebook](./eda.ipynb)
+
+
 ## Evolution of mean PSxG - GA:
 
 
