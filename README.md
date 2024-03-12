@@ -1,5 +1,5 @@
 
-# A statistical framework to summarise the evolution of the goalkeeper in football
+# A statistical analysis to summarise the evolution of the goalkeeper in football
 
 
 The role of the goalkeeper in football has undergone a notable
