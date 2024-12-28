@@ -1,6 +1,7 @@
 import requests
 import matplotlib.pyplot as plt
 from scipy.stats import kendalltau
+from datetime import datetime
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -9,10 +10,12 @@ import re
 import sys, getopt
 import csv
 
-url_idx = {
+league_url_idx = {
         'Premier League':9,
         'Bundesliga': 20,
-        'La Liga' : 12
+        'La Liga' : 12,
+        'Serie A': 11,
+        'Ligue 1': 13
     }
 
 feature_transcriber = {
@@ -28,6 +31,20 @@ y_axis_unit = {
     'gk_psxg_net' : '',
     'gk_save_pct' : '(%)'
 }
+
+def encode_season(season_str: str) -> str:
+    """
+    If 'season_str' matches the current soccer season (e.g., '2024-2025'),
+    return an empty string; otherwise, return the original 'season_str'.
+    """
+    this_year = datetime.now().year
+    next_year = this_year + 1
+
+    current_season = f"{this_year}-{next_year}"
+    
+    if season_str == current_season:
+        return "",""
+    return season_str.split("-")[0],season_str+'-'
 
 
 #standard(stats)
@@ -101,11 +118,11 @@ def get_tables(url,text):
     
     team_table = all_tables[0]
     team_vs_table = all_tables[1]
-    #player_table = all_tables[2]
+    player_table = all_tables[2]
     if text == 'for':
-      return None, team_table
+      return player_table, team_table
     if text == 'vs':
-      return None, team_vs_table
+      return player_table, team_vs_table
 
 def get_frame(features, player_table):
     pre_df_player = dict()
@@ -121,7 +138,7 @@ def get_frame(features, player_table):
                 text=a.decode("utf-8")
                 if(text == ''):
                     text = '0'
-                if(not(f == 'player') and not(f == 'nationality') and not(f == 'position') and not(f == 'squad') and not(f == 'age') and not(f == 'birth_year') and not(isinstance(text,str))):
+                if(not(f == 'player') and not(f == 'nationality') and not(f == 'position') and not(f == 'team') and not(f == 'age') and not(f == 'birth_year') ): #and not(isinstance(text,str))
                     text = float(text.replace(',',''))
                 if f in pre_df_player:
                     pre_df_player[f].append(text)
@@ -269,7 +286,7 @@ def calc_and_plot_adv_trends(feature = None, seasons = None):
     time_series_values = []
 
     for season in seasons:
-        if season == '2022-2023':
+        if season == '2024-2025':
             top_year = ''
             end_year = ''
         else:
@@ -304,7 +321,7 @@ def calc_and_plot_adv_trends(feature=None, seasons=None):
     time_series_values = [[] for _ in range(len(leagues))]
     
     for season in seasons:
-        if season == '2022-2023':
+        if season == '2024-2025':
             top_year = ''
             end_year = ''
         else:
@@ -312,7 +329,7 @@ def calc_and_plot_adv_trends(feature=None, seasons=None):
             end_year = season + '-'
         
         for i, league in enumerate(leagues):
-            url_idx_value = url_idx[league]
+            url_idx_value = league_url_idx[league]
             top = f'https://fbref.com/en/comps/{url_idx_value}/{top_year}/'
             end = f'/{end_year}{league.replace(" ", "-")}-Stats'
 
@@ -363,14 +380,14 @@ def calc_and_plot_adv_trends(feature=None, seasons=None):
 
 def get_passing_stats_per_team(league, season):
     # Function implementation to retrieve passing stats per team for a given league and season
-    if season == '2022-2023':
+    if season == '2024-2025':
         top_year = ''
         end_year = ''
     else:
         top_year = season
         end_year = season + '-'
     
-    url_idx_value = url_idx[league]
+    url_idx_value = league_url_idx[league]
     top = f'https://fbref.com/en/comps/{url_idx_value}/{top_year}/'
     end = f'/{end_year}{league.replace(" ", "-")}-Stats'
     
@@ -427,7 +444,7 @@ def calc_and_plot_trad_trends(feature=None, seasons=None):
     time_series_values = [[] for _ in range(len(leagues))]
     
     for season in seasons:
-        if season == '2022-2023':
+        if season == '2024-2025':
             top_year = ''
             end_year = ''
         else:
@@ -435,7 +452,7 @@ def calc_and_plot_trad_trends(feature=None, seasons=None):
             end_year = season + '-'
         
         for i, league in enumerate(leagues):
-            url_idx_value = url_idx[league]
+            url_idx_value = league_url_idx[league]
             top = f'https://fbref.com/en/comps/{url_idx_value}/{top_year}/'
             end = f'/{end_year}{league.replace(" ", "-")}-Stats'
 
